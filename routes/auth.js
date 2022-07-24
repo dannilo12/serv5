@@ -1,29 +1,38 @@
 const express = require('express');
 const router = express.Router();
+const Pessoa = require("../models/pessoa"); //inmporta a coleção
+const bcrypt = require('bcrypt');
 
 //...................tratamento.........................
-
-const Pessoa = require("../models/pessoa"); //inmporta a coleção
 
 router.post('/signup', (req, res) => {
    console.log("Entrou!")
    
-Pessoa.findOne({email: req.body.email})
-.then(doc_pessoa => {
-    if (doc_pessoa){
+Pessoa.findOne({username: req.body.username, email: req.body.email, comment: req.body.comment})
+
+.then(informacoes => {
+    if (informacoes){
         //ja existe
         return res.status(400).json({emailerror: "email já registrado no sistema"});
-    }else{
-        //registrar email
+    }
+    if (informacoes){
+        return res.status(400).json({usernameerror: "usuario já registrado no sistema"});
+    
+    }if (informacoes){
+        return res.status(400).json({commenterror: "email já registrado no sistema"});
+    }
+    else{
+        
+        //busca pelo post
         const novo_registro_pessoa = Pessoa({
-            name: rq.body.name,
-            email: req.body.email,
-            senha: req.body.senha,
             username: req.body.username,
+            senha: req.body.senha,
+            email: req.body.email,
+            comment: req.body.comment,
         });
 
         //......criptografia da senha........
-
+       
         bcrypt.genSalt(10, function(err, salt) {
             bcrypt.hash(novo_registro_pessoa.senha, salt, function(err, hash){
              if (err) throw err;
